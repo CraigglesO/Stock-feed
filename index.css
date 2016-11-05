@@ -208,12 +208,22 @@ input:active, input:hover {
 	color: #222;
 	border-radius: 7px;
 	text-align: center;
-	right: 100px;
+	right: 60px;
 	top: 50%;
 	transform: translateY(-50%);
 }
 
 .stock-add {
+	stroke: grey;
+	position: absolute;
+	right: 25px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.stock-added {
+	display: none;
+	stroke: grey;
+	fill: grey;
 	position: absolute;
 	right: 25px;
 	top: 50%;
@@ -701,7 +711,11 @@ span {
 
 
 /* stock details */
-
+.top {
+	z-index: 2000;
+	width: 100vw;
+	height: 45px;
+}
 
 .stock-detail {
 	z-index: 100;
@@ -748,20 +762,33 @@ span {
 }
 
 #top-dollar-detail {
+	position: absolute;
+	right: 0;
+	transform: translateX(-103px);
+	bottom: 19px;
 	display: inline !important;
 	padding: 0px;
 	font-size: 65px;
 }
 #top-change-f-detail {
-	transform: translateX(-50px);
+	position: absolute;
+	right: 0;
+	bottom: 25px;
+	transform: translateX(-65px);
 	display: inline !important;
 	padding: 0px;
 }
 #top-change-s-detail {
+	position: absolute;
+	right: 0px;
+	bottom: 25px;
+	transform: translateX(-40px);
 	display: inline !important;
 	padding: 0px;
 }
 #top-extra-detail {
+	position: absolute;
+	bottom: 0;
 	color: #30cd9a;
 	font-size: 13px;
 	width: 200px;

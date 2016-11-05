@@ -162,14 +162,25 @@ let options = {
   })
 };
 
+
 $(document).on('click', ".stock-info", function(e) {
   let id = this.id;
-  $('.stock-detail').css({
-    'transform': 'translateY(0)',
-    'opacity': '1'
-  });
-  $('#ticker-detail').text(`${id}`);
-  stockDetailing(id,'myChart-detail');
+  if (e.target.id == 'svg-add'){
+    $(`#${this.id} .stock-add`).css({'display':'none'});
+    $(`#${this.id} .stock-added`).css({'display':'block'});
+  }
+  else if (e.target.id == 'svg-added'){
+    $(`#${this.id} .stock-add`).css({'display':'block'});
+    $(`#${this.id} .stock-added`).css({'display':'none'});
+  }
+  else {
+    $('.stock-detail').css({
+      'transform': 'translateY(0)',
+      'opacity': '1'
+    });
+    $('#ticker-detail').text(`${id}`);
+    stockDetailing(id,'myChart-detail');
+  }
 });
 
 
@@ -349,12 +360,12 @@ function stockDetailing (id,div) {
         if (div == 'myChart'){
           myChartPrev = prevClose;
           myLatestVal = latestVal;
+          $('.middle-bar').text(`$${myLatestVal}`);
         }
         else if (div == 'myChart-detail'){
           detailChartPrev = prevClose;
           detailLatestVal = latestVal;
         }
-        $('.middle-bar').text(`$${latestVal}`);
         if (lastPoint < prevClose){
           $('.fonts').css({"color":"#f1563a"});
           $('.objects').css({"stroke":"#f1563a","color":"#222"});
@@ -928,7 +939,7 @@ $(document).ready(function(){
 
   //setInterval(function() { ObserveInputValue($('#input_id').val()); }, 100);
 
-  $('#stockSearch').on("change keyup paste",function() {
+  $('#stockSearch').on("focus",function() {
    var elem = $(this);
 
    // Save current value of element
@@ -983,14 +994,36 @@ function addStocks (stocks,callback) {
         <div class="stock-data"></div>
         <div class="stock-value"></div>
 
-       <div class="stock-add">P</div>
+        <div class="stock-add">
+          <svg version="1.1" id="svg-add" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          width="19.7px" height="19.7px" viewBox="0 0 19.7 19.7" style="enable-background:new 0 0 19.7 19.7;" xml:space="preserve">
+            <circle id="svg-add" style="fill:none;stroke-miterlimit:10;" cx="9.8" cy="9.8" r="9.3"/>
+            <g id="svg-add">
+
+              <line id="svg-add" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="9.8" y1="5.2" x2="9.8" y2="14.5"/>
+
+              <line id="svg-add" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="5.2" y1="9.8" x2="14.5" y2="9.8"/>
+            </g>
+          </svg>
+        </div>
+        <div class="stock-added">
+          <svg version="1.1" id="svg-added" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          width="19.7px" height="19.7px" viewBox="0 0 19.7 19.7" style="enable-background:new 0 0 19.7 19.7;" xml:space="preserve">
+            <path id="svg-added" style="stroke-miterlimit:10;" d="M9.8,0.5c-5.2,0-9.3,4.2-9.3,9.3s4.2,9.3,9.3,9.3
+            c5.2,0,9.3-4.2,9.3-9.3S15,0.5,9.8,0.5z M16.1,7.3l-7.3,7.3c0,0,0,0,0,0c-0.3,0.3-0.7,0.4-1.1,0.4S7,14.9,6.7,14.6l-3.2-3.2
+            C3,10.9,3,9.9,3.6,9.3c0.6-0.6,1.5-0.6,2.1,0l2.1,2.1L14,5.2c0.6-0.6,1.5-0.6,2.1,0C16.7,5.8,16.7,6.8,16.1,7.3z"/>
+          </svg>
+        </div>
 
         <div class="line"></div>
 
       </div>
       `);
+      $(`#${stock.symbol} .stock-data`).css({
+        'right':'160px',
+        'width': '30vw'
+      });
     }
-
   });
   callback();
 }
@@ -1012,6 +1045,10 @@ function updateValues () {
           currentOpen = currentOpen[4];
           currentOpen = (Math.round(currentOpen * 100) / 100).toFixed(2);
           //set value
+          if (isNaN(currentOpen)){
+            $(`#${idName}`).remove();
+            return;
+          }
           $(`#${idName} .stock-value`).text(`$${currentOpen}`);
 
           //make a chart:
@@ -1032,10 +1069,14 @@ function updateValues () {
           if (lastPoint < prevClose){
             $(`#${idName} .stock-data`).css({"stroke": "#f1563a"});
             $(`#${idName} .stock-value`).css({"background-color":"#f1563a"});
+            $(`#${idName} .stock-add`).css({"stroke": "#f1563a"});
+            $(`#${idName} .stock-added`).css({"fill": "#f1563a", "stroke":"#f1563a"});
           }
           else {
             $(`#${idName} .stock-data`).css({"stroke": "#30cd9a"});
             $(`#${idName} .stock-value`).css({"background-color":"#30cd9a"});
+            $(`#${idName} .stock-add`).css({"stroke": "#30cd9a"});
+            $(`#${idName} .stock-added`).css({"fill": "#30cd9a","stroke":"#30cd9a"});
           }
           currentOpen = currentOpen.slice(17,currentOpen.length-1);
           chartDate = [];
@@ -1078,10 +1119,6 @@ function updateValues () {
 
   });
 }
-
-
-
-
 
 function addMainStocks (stocks,callback,which) {
   stocks.forEach((stock,i) => {
@@ -1208,7 +1245,9 @@ function updateMainValues () {
                       });
               };
           });
-
+          chart.on('created', function(data) {
+            checkCollision();
+          });
 
         }
     }

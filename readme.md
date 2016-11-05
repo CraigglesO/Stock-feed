@@ -1,4 +1,4 @@
-# twitter-feed
+# Stock-feed
 
 > My stylish app
 
@@ -27,5 +27,3 @@ Builds the app for macOS, Linux, and Windows, using [electron-packager](https://
 ## License
 
 MIT © [oconnorct1](http://craiggleso.github.io)
-# Stock-feed
-# Stock-feed
