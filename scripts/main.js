@@ -1,3 +1,4 @@
+
 var usrTrackerDay = 0;
 var usrTrackerMonth = 0;
 var usrTrackerYear = 0;
@@ -6,13 +7,14 @@ var myLatestVal = 0;
 var detailChartPrev = 0;
 var detailLatestVal = 0;
 var latestVal = 0;
+
 var user = {
   name: 'Craig O\'Connor',
   portfolioValue: 0,
   buyingPower: 0,
   ticker: 'DOV',
-  myTickers: ['DOV','AAPL','GOOGL','AMD'],
-  watching: ['PMTS','AMDA','MDXG','HALO','FIG','GPRO','FIT','TWTR','NFLX'],
+  myTickers: ['DOV','AAPL','AMD','AMDA'],
+  watching: ['DOV','AAPL','GOOGL','AMD','PMTS','AMDA','MDXG','HALO','FIG','GPRO','FIT','TWTR','NFLX'],
   updates: [
     {
       label: 'down',
@@ -163,15 +165,31 @@ let options = {
 };
 
 
+$(document).on('click', ".container-watching", function(e) {
+  if (e.target.id == "dlt"){
+    let id = e.currentTarget.id.split('-')[2];
+    let index = user.watching.indexOf(id);
+    user.watching.splice(index,1);
+    $(e.currentTarget).animate({height:"0"}, 200, function(){$(e.currentTarget).remove();});
+  }
+});
+
 $(document).on('click', ".stock-info", function(e) {
   let id = this.id;
   if (e.target.id == 'svg-add'){
     $(`#${this.id} .stock-add`).css({'display':'none'});
     $(`#${this.id} .stock-added`).css({'display':'block'});
+    user.watching.push(id);
+    $('.container-watching').remove();
+    addMainStocks(user.watching,updateMainValues,'watching');
   }
   else if (e.target.id == 'svg-added'){
     $(`#${this.id} .stock-add`).css({'display':'block'});
     $(`#${this.id} .stock-added`).css({'display':'none'});
+    let index = user.watching.indexOf(id);
+    user.watching.splice(index,1);
+    $('.container-watching').remove();
+    addMainStocks(user.watching,updateMainValues,'watching');
   }
   else {
     $('.stock-detail').css({
@@ -196,6 +214,11 @@ $(document).on('scroll', function(e) {
 var pos1, pos2, vertical = false, clickerSet = false, divy;
 var num = 0; nar = 0;
 
+// $(document).on('mousemove',".stock-main-info", function(e) {
+//   $(this).on('mousewheel', function(event){
+//     console.log(`x: ${event.deltaX}, y: ${event.deltaY}, dF: ${event.deltaFactor}`);
+//   });
+// });
 
 $(document).on('mousedown', ".stock-main-info", function(e) {
   // let looper = this.currentTarget.offsetParent.nextSibling;
@@ -204,7 +227,6 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
     if (vertical == true) {
 
       vertical = false;
-      console.log('working!');
       $(`#my-stock`).trigger('sortupdate'); // Trigger the update event manually
 
       $(`#${this.id}`).css({
@@ -226,7 +248,6 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
 
       $(document).bind('mouseup', diver, function(e){
         widget._mouseUp(e);
-        console.log('finishing');
 
         $(`#${diver.id}`).css({
           'opacity': '1',
@@ -252,12 +273,18 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
 
   var timer1 = setTimeout((pos1) => {
     //vertical drag
-    console.log('timelimit called');
     posT = this.id;
     posTT = $(`#${posT}`).offset().top;
     posT = $(`#${posT}`).position().left;
 
-    if (posT == pos1 && posTT == pos1T && clickerSet && posT == 150 && !vertical){
+    let polla;
+    if($(`#containment-wrapper-${divy} .delete`).css('display') == 'none') {
+      polla = 150;
+    }
+    else {
+      polla = 225;
+    }
+    if (posT == pos1 && posTT == pos1T && posT == polla && clickerSet && !vertical){
       $(`#${this.id}`).css({'background-color': '#303030'});
       let widget = $(`#${this.id}`).draggable( 'disable' );
       widget = widget.data('ui-draggable');
@@ -286,43 +313,86 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
     divyLeft = $(`#${divy}`).position().left;
     if (pos1 != divyLeft){
       //move left or right:
-      if (divyLeft > 60){
-        //move back
-        $(`#${divySave}`).css({'transition': '0.3s'});
-        $(`#${divySave}`).css({'left': '150px'});
-        setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+      if($(`#containment-wrapper-${divy} .delete`).css('display') == 'none'){
+        if (divyLeft > 75){
+          //move back
+          $(`#${divySave}`).css({'transition': '0.3s'});
+          $(`#${divySave}`).css({'left': '150px'});
+          setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        }
+        else {
+          //move to position left
+          // $('html').one('mousedown',function() {
+          //   $(`#${divySave}`).css({'transition': '0.3s'});
+          //   $(`#${divySave}`).css({'left': '150px'});
+          //   setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+          // });
+          // e.stopPropagation();
+          $(`#${divySave}`).css({'transition': '0.3s'});
+          $(`#${divySave}`).css({'left': '0px'});
+          setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        }
       }
       else {
-        //move to position left
-        // $('html').one('mousedown',function() {
-        //   $(`#${divySave}`).css({'transition': '0.3s'});
-        //   $(`#${divySave}`).css({'left': '150px'});
-        //   setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
-        // });
-        // e.stopPropagation();
-        $(`#${divySave}`).css({'transition': '0.3s'});
-        $(`#${divySave}`).css({'left': '0px'});
-        setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        if (divyLeft > 100){
+          //move back
+          $(`#${divySave}`).css({'transition': '0.3s'});
+          $(`#${divySave}`).css({'left': '225px'});
+          setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        }
+        else {
+          //move to position left
+          // $('html').one('mousedown',function() {
+          //   $(`#${divySave}`).css({'transition': '0.3s'});
+          //   $(`#${divySave}`).css({'left': '150px'});
+          //   setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+          // });
+          // e.stopPropagation();
+          $(`#${divySave}`).css({'transition': '0.3s'});
+          $(`#${divySave}`).css({'left': '0px'});
+          setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        }
       }
     }
     else {
       //if position is NOT 150, set it to 150
-      if (divyLeft != 150){
-        $(`#${divySave}`).css({'transition': '0.3s'});
-        $(`#${divySave}`).css({'left': '150px'});
-        setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+      if($(`#containment-wrapper-${divy} .delete`).css('display') == 'none'){
+        if (divyLeft != 150){
+          $(`#${divySave}`).css({'transition': '0.3s'});
+          $(`#${divySave}`).css({'left': '150px'});
+          setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        }
+        else {
+          //open the tickers info:
+          let id = divySave;
+          $('.stock-detail').css({
+            'transform': 'translateY(0)',
+            'opacity': '1'
+          });
+          $('body').addClass('stop-scrolling');
+          $('#ticker-detail').text(`${id}`);
+          $(document).unbind('mouseup');
+          stockDetailing(id,'myChart-detail');
+        }
       }
       else {
-        //open the tickers info:
-        let id = divySave;
-        $('.stock-detail').css({
-          'transform': 'translateY(0)',
-          'opacity': '1'
-        });
-        $('body').addClass('stop-scrolling');
-        $('#ticker-detail').text(`${id}`);
-        $(document).unbind('mouseup');
-        stockDetailing(id,'myChart-detail');
+        if (divyLeft != 225){
+          $(`#${divySave}`).css({'transition': '0.3s'});
+          $(`#${divySave}`).css({'left': '225px'});
+          setTimeout(() => {$(`#${divySave}`).css({'transition': '0s'});},350);
+        }
+        else {
+          //open the tickers info:
+          let id = divySave;
+          $('.stock-detail').css({
+            'transform': 'translateY(0)',
+            'opacity': '1'
+          });
+          $('body').addClass('stop-scrolling');
+          $('#ticker-detail').text(`${id}`);
+          $(document).unbind('mouseup');
+          stockDetailing(id,'myChart-detail');
+        }
       }
     }
     $(document).unbind('mouseup');
@@ -679,7 +749,6 @@ function checkCollision() {
   let collisiont = false;
   $.each( $('.containment-wrapper'), function(i, div) {
      if (collision($(`#${div.id} .stock-name`),$(`#${div.id} .stock-data`))){
-       console.log('collision!');
        collisiont = true;
      }
   });
@@ -696,39 +765,39 @@ $(document).ready(function(){
 
 
   od = new Odometer({
-  el: document.querySelector("#top-dollar"),
-  theme: 'default',
-  format: '(,ddd)',
+    el: document.querySelector("#top-dollar"),
+    theme: 'default',
+    format: '(,ddd)',
   });
 
   od2 = new Odometer({
-  el: document.querySelector("#top-change-f"),
-  theme: 'default',
-  format: '(dd)',
+    el: document.querySelector("#top-change-f"),
+    theme: 'default',
+    format: '(dd)',
   });
 
   od3 = new Odometer({
-  el: document.querySelector("#top-change-s"),
-  theme: 'default',
-  format: '(dd)',
+    el: document.querySelector("#top-change-s"),
+    theme: 'default',
+    format: '(dd)',
   });
 
   detailOd = new Odometer({
-  el: document.querySelector("#top-dollar-detail"),
-  theme: 'default',
-  format: '(,ddd)',
+    el: document.querySelector("#top-dollar-detail"),
+    theme: 'default',
+    format: '(,ddd)',
   });
 
   detailOd2 = new Odometer({
-  el: document.querySelector("#top-change-f-detail"),
-  theme: 'default',
-  format: '(dd)',
+    el: document.querySelector("#top-change-f-detail"),
+    theme: 'default',
+    format: '(dd)',
   });
 
   detailOd3 = new Odometer({
-  el: document.querySelector("#top-change-s-detail"),
-  theme: 'default',
-  format: '(dd)',
+    el: document.querySelector("#top-change-s-detail"),
+    theme: 'default',
+    format: '(dd)',
   });
 
   updateUnderTow("OD");
@@ -849,6 +918,18 @@ $(document).ready(function(){
   $( window ).resize(() => {
     //collision($div1, $div2)
     checkCollision();
+    let arr = ['#OD','#OW','#OM','#TM','#OY','#ALL'];
+    let id;
+    arr.forEach((v) => {
+      if ($(`${v}`).css('color') == 'rgb(237, 237, 237)'){
+        id = v;
+      }
+    });
+    let leftPos = $(`${id}`).offset().left;
+    //set those to updateUnderTow:
+    $(`#choose-time-undertow`).css({
+      'transform': `translateX(${leftPos-5}px)`,
+    });
 
   });
 
@@ -1078,6 +1159,10 @@ function updateValues () {
             $(`#${idName} .stock-add`).css({"stroke": "#30cd9a"});
             $(`#${idName} .stock-added`).css({"fill": "#30cd9a","stroke":"#30cd9a"});
           }
+          if (user.watching.includes(idName)){
+            $(`#${idName} .stock-add`).css({'display':'none'});
+            $(`#${idName} .stock-added`).css({'display':'block'});
+          }
           currentOpen = currentOpen.slice(17,currentOpen.length-1);
           chartDate = [];
           currentOpen.forEach((value,i) => {
@@ -1122,44 +1207,67 @@ function updateValues () {
 
 function addMainStocks (stocks,callback,which) {
   stocks.forEach((stock,i) => {
-    $(`#my-stock-${which}`).append(`
-    <div class="containment-wrapper" id="containment-wrapper-${stock}">
-      <div class="delete">DELETE</div>
-      <div class="stock-main-info" id="${stock}">
+    if (which == 'watching' && user.myTickers.includes(stock)) {
 
-        <div class="stock-left">
-          <div class="stock-symbol">${stock}</div>
-          <div class="stock-name"></div>
-        </div>
-
-        <div class="stock-data"></div>
-        <div class="stock-main-value"></div>
-
-        <div class="line"></div>
-
-      </div>
-    </div>
-    `);
-
-    $( `#${stock}` ).draggable({
-      scroll: false,
-      containment: `#containment-wrapper-${stock}`,
-      stop: () => {console.log('draggable finished.')}
-    });
-    //$( `#containment-wrapper-${stock}` ).draggable({ axis: "y", handle: `#move-${stock}`, scroll: true });
-    // $( `#containment-wrapper-${stock}` ).sortable({
-    //   containment: '#my-stock'
-    // });
-    if (i == stocks.length - 1){
-      $(`#${stock} .line`).css({
-        'width':'100vw',
-        'transform': 'translateX(0px)'
-      });
     }
     else {
-      $(`#${stock} .line`).css({
-        'width':'100vw',
+      $(`#my-stock-${which}`).append(`
+      <div class="containment-wrapper container-${which}" id="containment-wrapper-${stock}">
+        <div class="buy" id="by">BUY</div>
+        <div class="sell" id="sll">SELL</div>
+        <div class="delete" id="dlt">DELETE</div>
+        <div class="stock-main-info" id="${stock}">
+
+          <div class="stock-left">
+            <div class="stock-symbol">${stock}</div>
+            <div class="stock-name"></div>
+          </div>
+
+          <div class="stock-data"></div>
+          <div class="stock-main-value"></div>
+
+          <div class="line"></div>
+
+        </div>
+      </div>
+      `);
+
+      if (which == 'watching'){
+        $(`#my-stock-${which} .sell`).css({'display':'none'});
+        $(`#my-stock-${which} .containment-wrapper`).css({
+          'width': 'calc(100vw + 225px)',
+          'transform': 'translateX(-225px)'
+        });
+      }
+      if (which == 'myTickers'){
+        $(`#my-stock-${which} .delete`).css({'display':'none'});
+        $(`#my-stock-${which} .buy`).css({'right':'75px'});
+      }
+
+      $( `#${stock}` ).draggable({
+        scroll: false,
+        containment: `#containment-wrapper-${stock}`,
+        stop: () => {
+
+        },
+        drag: function (event, ui) {
+          var mult = 0.5;
+          console.log(`pos: ${ui.position.left}`);
+          if (ui.position.left <= 0){
+            ui.position.left -= ((1 + (ui.position.left)) * mult);
+          }
+        }
       });
+      //$( `#containment-wrapper-${stock}` ).draggable({ axis: "y", handle: `#move-${stock}`, scroll: true });
+      // $( `#containment-wrapper-${stock}` ).sortable({
+      //   containment: '#my-stock'
+      // });
+      if (i == stocks.length - 1){
+        $(`.container-${which} #${stock} .line`).css({
+          'width':'100vw',
+          'transform': 'translateX(0px)'
+        });
+      }
     }
 
   });
@@ -1207,10 +1315,12 @@ function updateMainValues () {
           if (lastPoint < prevClose){
             $(`#${idName} .stock-data`).css({"stroke": "#f1563a"});
             $(`#${idName} .stock-main-value`).css({"background-color":"#f1563a"});
+            $(`#containment-wrapper-${idName} .buy`).css({"background-color":"#f1563a"});
           }
           else {
             $(`#${idName} .stock-data`).css({"stroke": "#30cd9a"});
             $(`#${idName} .stock-main-value`).css({"background-color":"#30cd9a"});
+            $(`#containment-wrapper-${idName} .buy`).css({"background-color":"#30cd9a"});
           }
           currentOpen = currentOpen.slice(17,currentOpen.length-1);
           chartDate = [];

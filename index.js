@@ -21,7 +21,7 @@ function createMainWindow() {
 		height: 580,
 		minWidth: 340,
 		minHeight: 580,
-		frame: false,
+		// frame: false,
 	});
 
 	win.loadURL(`file://${__dirname}/index.html`);
