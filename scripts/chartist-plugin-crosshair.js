@@ -84,7 +84,7 @@
 
             } else if(data.type === 'line') {
               var sn=data.element.parent();
-              if(sn.attr('class')==='ct-series ct-series-a') {
+              if(sn.attr('class')==='ct-series ct-series-b') {
                  snm= sn.attr('ct:series-name');
 
               };
@@ -127,7 +127,7 @@
 
           $chart.on('mousemove', function(e) {
               var x=e.clientX-ofx,y=e.clientY;
-              var kids = $(this).find('.ct-series-a');
+              var kids = $(this).find('.ct-series-b');
               var pt2=0,pt1=0,p;
               kids.children().each(function( index ){
                 var cp=$(this);
@@ -204,7 +204,7 @@
                   $('#top-dollar-detail').text(dollar);
                   $('#top-change-f-detail').text(change);
                   $('#top-change-s-detail').text(change2);
-                  time = new Date(parseInt(time)*1000);
+                  time = new Date(parseInt(time));
                   let hour = time.getHours();
                   let min = time.getMinutes();
                   hour = hour.toString();

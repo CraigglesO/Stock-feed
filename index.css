@@ -71,7 +71,6 @@ footer {
 
 .searches {
 	opacity: 0;
-	background-color: #222;
 	position: fixed;
 	width: 100vw;
 	height: 100vh;
@@ -104,7 +103,6 @@ footer {
 }
 
 input {
-	background-color: #222;
 	border: none;
 	font-size:20px;
 	font-weight: 200;
@@ -176,7 +174,6 @@ input:active, input:hover {
 }
 
 .stock-symbol {
-	color: #ededed;
 }
 
 .stock-name {
@@ -194,6 +191,17 @@ input:active, input:hover {
 	width: 35vw;
 	height: 85px;
 	right: 130px;
+	top: 50%;
+	transform: translateY(-50%);
+	transition: 0.5s;
+}
+
+.stock-data-info {
+	color: #707a7c;
+	position: absolute;
+	width: 30vw;
+	height: 85px;
+	right: 160px;
 	top: 50%;
 	transform: translateY(-50%);
 	transition: 0.5s;
@@ -243,7 +251,8 @@ input:active, input:hover {
 
 .ADD {
 	display: none;
-	background-color: rgba(0,0,0,.6);
+	background-color: #222;
+	opacity: 0.65;
 	position: fixed;
 	width: 100vw;
 	height: 100vh;
@@ -338,6 +347,7 @@ input:active, input:hover {
 
 .top-money {
 	display: absolute;
+	left: 50%;
 	font-size: 35px;
 	font-weight: 200;
 }
@@ -431,18 +441,18 @@ span {
 	transform: translateX(-50%);
 }
 
-.ct-series-b {
+.ct-series-a {
 	stroke: grey;
   stroke-width: 2.3px;
   stroke-dasharray: 0 10;
 	stroke-linecap: round;
 }
 
-.ct-series-b .ct-line {
+.ct-series-a .ct-line {
 	z-index: -1;
 }
 
-.ct-series-b .ct-point {
+.ct-series-a .ct-point {
 	stroke: none;
 	fill: none;
 }
@@ -473,10 +483,6 @@ span {
 	height: 3px;
 }
 
-#OD {
-	color: #ededed;
-}
-
 .ct-target-line {
   stroke: grey;
   stroke-width: 2px;
@@ -488,11 +494,11 @@ span {
 	fill: none;
 }
 
-.ct-series-a {
+.ct-series-b {
 	z-index: 100 !important;
 }
 
-.ct-series-a .ct-point {
+.ct-series-b .ct-point {
 	stroke: none;
 	stroke-width: 2px;
   /* Make your points appear as squares */
@@ -503,7 +509,6 @@ span {
 	overflow: hidden;
 	position: absolute;
 	bottom: 0px;
-	background-color: #303030;
 	width: calc(100vw - 200px);
 	height: 100px;
 	text-align: center;
@@ -532,7 +537,6 @@ span {
 .main {
 	border-radius: 7px;
 	position: absolute;
-	background-color: #222;
 	width: calc(100vw - 15px);
 	height: calc(100px - 15px);
 	left: calc(300vw + 7.5px);
@@ -541,7 +545,6 @@ span {
 .main-over {
 	border-radius: 7px;
 	position: absolute;
-	background-color: #222;
 	width: calc(100vw - 15px);
 	height: calc(100px - 15px);
 	left: calc(300vw + 7.5px);
@@ -636,7 +639,6 @@ span {
 #my-stock {
 	position: relative;
 	width: 100vw;
-	background-color: #222;
 	overflow: hidden;
 }
 
@@ -646,7 +648,6 @@ span {
 	position: relative;
 	transform: translateX(-150px);
 	cursor: pointer;
-	background-color: #222;
 }
 
 .delete {
@@ -697,7 +698,6 @@ span {
 	position: absolute;
 	right: 0;
 	cursor: pointer;
-	background-color: #222;
 }
 
 .stock-main-info div {
@@ -741,14 +741,17 @@ span {
 
 /* stock details */
 .top {
-	z-index: 2000;
+	position: absolute;
+	top:0;
+	background-color: #222;
+	z-index: 100;
 	width: 100vw;
 	height: 45px;
 }
 
 .stock-detail {
+	overflow: scroll;
 	z-index: 100;
-	background-color: #222;
 	position: fixed;
 	width: 100vw;
 	height: 100vh;
@@ -781,12 +784,28 @@ span {
 	padding-top: 10px;
 }
 
+.stock-add-detail {
+	display: none;
+	transform: scale(1.4);
+	position: absolute;
+	right: 15px;
+	top: 15px;
+	cursor: pointer;
+}
+.stock-added-detail {
+	transform: scale(1.4);
+	position: absolute;
+	right: 15px;
+	top: 15px;
+	cursor: pointer;
+}
+
 #ticker-detail {
 	color: #ededed;
 }
 
 #full-name-detail {
-	color: #707a7c;
+	color: grey;
 	font-size: 12px;
 }
 
@@ -836,9 +855,10 @@ span {
 	justify-content: space-between;
 	position: absolute;
 	text-align: center;
-	bottom: 100px;
+	bottom: 75px;
 	width: 300px;
 	height: 30px;
+	color: grey;
 }
 #choose-time-detail span {
 	cursor: pointer;
@@ -855,10 +875,59 @@ span {
 	stroke: #30cd9a;
 	position: absolute;
 	width: 100vw;
-	height: calc(100vh - 300px);
+	height: calc(100vh - 270px);
 	left: 50%;
-	bottom: 132.5px;
+	bottom: 105px;
 	transform: translateX(-50%);
+}
+.bottom {
+	position: absolute;
+	bottom: 0;
+	width: 100vw;
+	height: 75px;
+}
+#buy-sell {
+	background-color: grey;
+	position: absolute;
+	width: calc(100vw - 20px);
+	height: 55px;
+	line-height: 55px;
+	left: 10px;
+	top: 10px;
+	border-radius: 5px;
+	text-align: center;
+	font-size: 30px;
+	font-weight: 200;
+	cursor: pointer;
+}
+#sell-buy {
+	background-color: grey;
+	position: absolute;
+	width: calc(50vw - 20px);
+	height: 55px;
+	line-height: 55px;
+	right: 10px;
+	top: 10px;
+	border-radius: 5px;
+	text-align: center;
+	font-size: 30px;
+	font-weight: 200;
+	cursor: pointer;
+}
+.extra-content {
+	position: absolute;
+	width: 100vw;
+	height: 1000px;
+	top: 100vh;
+}
+#choose-time-undertow-detail {
+	left: 0;
+	background-color: grey;
+	position: absolute;
+	text-align: center;
+	bottom: 75px;
+	width: 20px;
+	height: 3px;
 }
 
 

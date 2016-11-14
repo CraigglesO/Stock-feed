@@ -3,17 +3,19 @@ var usrTrackerDay = 0;
 var usrTrackerMonth = 0;
 var usrTrackerYear = 0;
 var myChartPrev = 0;
+var myChartPrevN = 0;
 var myLatestVal = 0;
 var detailChartPrev = 0;
 var detailLatestVal = 0;
 var latestVal = 0;
+var stockTime = false;
 
 var user = {
   name: 'Craig O\'Connor',
   portfolioValue: 0,
   buyingPower: 0,
-  ticker: 'DOV',
-  myTickers: ['DOV','AAPL','AMD','AMDA'],
+  ticker: 'AMDA',
+  myTickers: ['MDXG','AMD','AMDA','AAPL'],
   watching: ['DOV','AAPL','GOOGL','AMD','PMTS','AMDA','MDXG','HALO','FIG','GPRO','FIT','TWTR','NFLX'],
   updates: [
     {
@@ -172,35 +174,52 @@ $(document).on('click', ".container-watching", function(e) {
     user.watching.splice(index,1);
     $(e.currentTarget).animate({height:"0"}, 200, function(){$(e.currentTarget).remove();});
   }
+  $('#buy-sell').css({'width': 'calc(100vw - 20px)'});
+  setTimeout(() => {
+    let color = $('.objects').css('stroke');
+    $('#svg-add-detail').css({'stroke':`${color}`,'fill':`${color}`,'cursor':'pointer'});
+    $('#svg-added-detail').css({'stroke':`${color}`,'fill':`${color}`,'cursor':'pointer'});
+  },1000);
 });
 
 $(document).on('click', ".stock-info", function(e) {
   let id = this.id;
+  let idTicker = id.split('-');
+  idTicker = idTicker[1];
   if (e.target.id == 'svg-add'){
     $(`#${this.id} .stock-add`).css({'display':'none'});
     $(`#${this.id} .stock-added`).css({'display':'block'});
-    user.watching.push(id);
+    user.watching.push(idTicker);
     $('.container-watching').remove();
-    addMainStocks(user.watching,updateMainValues,'watching');
+    addMainStocks(user.watching, updateMainValues,'watching');
+    let color = $('.just-back').css('background-color');
+    $('.stock-main-info').css({'background-color':`${color}`});
   }
   else if (e.target.id == 'svg-added'){
     $(`#${this.id} .stock-add`).css({'display':'block'});
     $(`#${this.id} .stock-added`).css({'display':'none'});
-    let index = user.watching.indexOf(id);
+    let index = user.watching.indexOf(idTicker);
     user.watching.splice(index,1);
     $('.container-watching').remove();
     addMainStocks(user.watching,updateMainValues,'watching');
+    let color = $('.just-back').css('background-color');
+    $('.stock-main-info').css({'background-color':`${color}`});
   }
   else {
     $('.stock-detail').css({
       'transform': 'translateY(0)',
       'opacity': '1'
     });
-    $('#ticker-detail').text(`${id}`);
-    stockDetailing(id,'myChart-detail');
+    $('#ticker-detail').text(`${idTicker}`);
+    stockDetailing(idTicker,'myChart-detail');
   }
 });
 
+$(document).on('click', ".container-myTickers", function(e) {
+  $('#buy-sell').css({'width': 'calc(50vw - 20px)'});
+  $('#svg-add-detail').css({'stroke':'grey','fill':'grey','cursor':'default'});
+  $('#svg-added-detail').css({'stroke':'grey','fill':'grey','cursor':'default'});
+});
 
 $(document).on('scroll', function(e) {
   if ($(document).scrollTop() < 50) {
@@ -213,6 +232,8 @@ $(document).on('scroll', function(e) {
 
 var pos1, pos2, vertical = false, clickerSet = false, divy;
 var num = 0; nar = 0;
+var color, opac;
+var changedd = false;
 
 // $(document).on('mousemove',".stock-main-info", function(e) {
 //   $(this).on('mousewheel', function(event){
@@ -252,8 +273,9 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
         $(`#${diver.id}`).css({
           'opacity': '1',
         });
+        color = $(`.just-back`).css('background-color');
         $(`.stock-main-info`).css({
-          'background-color': '#222'
+          'background-color': `${color}`
         });
         $(`.stock-main-info`).draggable();
         $(`.stock-main-info`).draggable( 'enable' );
@@ -285,7 +307,8 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
       polla = 225;
     }
     if (posT == pos1 && posTT == pos1T && posT == polla && clickerSet && !vertical){
-      $(`#${this.id}`).css({'background-color': '#303030'});
+      color = $(`.border`).css('background-color');
+      $(`#${this.id}`).css({'background-color': `${color}`});
       let widget = $(`#${this.id}`).draggable( 'disable' );
       widget = widget.data('ui-draggable');
       widget._mouseUp(e);
@@ -309,7 +332,7 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
       divy = divySave;
     }
     divySave = divy;
-    $(`#${divy}`).css({'background-color': '#222'});
+    $(`#${divy}`).css({'background-color': `${color}`});
     divyLeft = $(`#${divy}`).position().left;
     if (pos1 != divyLeft){
       //move left or right:
@@ -402,6 +425,121 @@ $(document).on('mousedown', ".stock-main-info", function(e) {
   return;
 });
 
+function bindMouseToUpdates (count) {
+  for (let i = 0; i < count; i++) {
+    $(document).on('mousedown', `#updates-inner-${i}`, function(e) {
+
+      $(document).bind('mouseup', `#updates-inner-${i}`, function(e){
+        $(`#updates-inner-${i}`).css({'transition':'0.25s'});
+        $(`#updates-inner-${i+1}`).css({'transition':'0.25s'});
+        $('#update-circle-text').css({'transition':`0.5s`});
+        //console.log(`opac: ${opac}`);
+        if (opac <= 0.75){
+          //finish the movement
+          if (parseInt($('#update-circle-text').text()) <= 1){
+            $('#update-circle').css({'transition':`1s`});
+            $('#update-circle').css({
+              'transform':`scale(120)`
+            });
+            $('#update-circle-text').css({
+              'opacity':`0`,
+              'transform':`scale(1)`
+            });
+            setTimeout(() => {
+              $('#svg-cat').css({
+                'display':`block`,
+                'opacity':`1`,
+              });
+            },450);
+            setTimeout(() => {
+              $('#svg-cat').css({
+                'display':`none`,
+                'opacity':`0`,
+              });
+              $('#start-over').css({
+                'display':'block'
+              })
+              $('#update-circle').css({
+                'transition':`0.5s`,
+              });
+              $('#update-circle').css({
+                'transform':`scale(0)`
+              });
+            },1000);
+          }
+          else {
+            $('#update-circle-text').css({
+              'opacity':`1`,
+              'transform':`scale(1)`
+            });
+          }
+          dragPos = $( `#updates-inner-${i}` ).offset().left;
+          let windowWidth = $( document ).width();
+          if (dragPos > 0){
+            //move right
+            dragPos = $( `#updates-inner-${i}` ).offset();
+            dragPos.left = windowWidth;
+            $(`#updates-inner-${i}`).offset(dragPos);
+            let circleText = parseInt($('#update-circle-text').text());
+            circleText--;
+            $('#update-circle-text').text(circleText);
+            setTimeout(() => {
+              $(`#updates-inner-${i}`).remove();
+              $(document).off('mousedown',`#updates-inner-${i}`);
+            },300);
+          }
+          else {
+            //move left
+            dragPos = $( `#updates-inner-${i}` ).offset();
+            dragPos.left = -windowWidth;
+            $(`#updates-inner-${i}`).offset(dragPos);
+            let circleText = parseInt($('#update-circle-text').text());
+            circleText--;
+            $('#update-circle-text').text(circleText);
+            setTimeout(() => {
+              $(`#updates-inner-${i}`).remove();
+              $(document).off('mousedown',`#updates-inner-${i}`);
+            },300);
+          }
+          $( `#updates-inner-${i+1}` ).css({
+            'opacity':'1',
+            'transform':'scale(1)'
+          });
+        }
+        else {
+          //put it back
+          changedd = false;
+          $('#update-circle').css({'transition':`0.3s`});
+          $('#update-circle-text').css({'transition':`0.3s`});
+          $('#update-circle').css({
+            'opacity':`1`,
+            'transform':`scale(1)`
+          });
+          $('#update-circle-text').css({'opacity':`1`,'transform':'scale(1)'});
+          $(`#updates-inner-${i}`).css({
+            'transition-timing-function': 'cubic-bezier(.17,-.41,.19,1.44)'
+          });
+          dragPos = $( `#updates-inner-${i}` ).offset();
+          dragPos.left = 7.5;
+          $(`#updates-inner-${i}`).offset(dragPos);
+          //$(`#updates-inner-${i}`).offset(0);
+          $('#update-circle').css({'transition':`0s`});
+          $('#update-circle-text').css({'transition':`0s`});
+        }
+        setTimeout(() => {
+          $(`#updates-inner-${i}`).css({
+            'transition':'0s',
+            'transition-timing-function': 'none'
+          });
+          $(`#updates-inner-${i+1}`).css({'transition':'0s'});
+          $('#update-circle-text').css({'transition':`0s`});
+          $(document).unbind('mouseup');
+        },300);
+      });
+    });
+  }
+}
+
 function stockDetailing (id,div) {
   let chartDate = [];
   let prevClose = 0;
@@ -420,8 +558,8 @@ function stockDetailing (id,div) {
         startDate = startDate[1].split(',');
         endDate = startDate[1];
         startDate = startDate[0];
-        startDate = new Date(parseInt(startDate));
-        endDate = new Date(parseInt(endDate));
+        startDate = new Date(parseInt(startDate)*1000);
+        endDate = new Date(parseInt(endDate)*1000);
         lastPoint = currentOpen[currentOpen.length-2];
         lastPoint = lastPoint.split(',');
         lastPoint = lastPoint[4];
@@ -429,6 +567,7 @@ function stockDetailing (id,div) {
         latestVal = Math.round(latestVal * 100) / 100;
         if (div == 'myChart'){
           myChartPrev = prevClose;
+          myChartPrevN = currentOpen[8];
           myLatestVal = latestVal;
           $('.middle-bar').text(`$${myLatestVal}`);
         }
@@ -439,12 +578,14 @@ function stockDetailing (id,div) {
         if (lastPoint < prevClose){
           $('.fonts').css({"color":"#f1563a"});
           $('.objects').css({"stroke":"#f1563a","color":"#222"});
+          $('.objects-fill').css({"fill":"#f1563a"});
           $('.backgrounding').css({"background-color":"#f1563a","color":"#222"});
           $(`#${div}`).css({"stroke": "#f1563a"});
         }
         else {
           $('.fonts').css({"color":"#30cd9a"});
           $('.objects').css({"stroke":"#30cd9a","color":"#ededed"});
+          $('.objects-fill').css({"fill":"#30cd9a"});
           $('.backgrounding').css({"background-color":"#30cd9a","color":"#ededed"});
           $(`#${div}`).css({"stroke": "#30cd9a"});
         }
@@ -453,22 +594,25 @@ function stockDetailing (id,div) {
           if (i % 5 == 0){
             value = value.split(',');
             obj = {'x':0,'y':0};
-            obj.x = new Date(parseInt(value[0]));
+            obj.x = new Date(parseInt(value[0])*1000);
             obj.y = parseFloat(value[1]);
             chartDate.push(obj);
           }
         });
 
+        startDate = chartDate[0].x;
+        //endDate = chartDate[chartDate.length-1].x;
+
         let chart = new Chartist.Line(`#${div}`, {
           labels: ['W1'],
           series: [
             {
-              name: 'series',
-              data: chartDate,
-            },
-            {
               name: 'line',
               data: [{'x':startDate,'y':prevClose},{'x':endDate,'y':prevClose}],
+            },
+            {
+              name: 'series',
+              data: chartDate,
             }
           ]
         }, options);
@@ -487,8 +631,22 @@ function stockDetailing (id,div) {
 
 
       }
+      // if (div == 'myChart'){
+      //   myChartPrev = prevClose;
+      //   myLatestVal = latestVal;
+      //   $('.middle-bar').text(`$${myLatestVal}`);
+      // }
+      // else if (div == 'myChart-detail'){
+      //   detailChartPrev = prevClose;
+      //   detailLatestVal = latestVal;
+      // }
       //update money:
-      updateMoney(`#${div}`,latestVal,prevClose);
+      if (div == 'myChart'){
+        updateMoney(`#${div}`,myLatestVal,myChartPrev);
+      }
+      else {
+        updateMoney(`#${div}`,detailLatestVal,detailChartPrev);
+      }
   }
   xmlHttpChart.open("GET", `http://chartapi.finance.yahoo.com/instrument/2.0/${id}/chartdata;type=quote;range=1d/csv`, true); // true for asynchronous
   xmlHttpChart.setRequestHeader( 'Access-Control-Allow-Origin', '*');
@@ -561,37 +719,24 @@ function flashCards () {
 
       </div>
       ` );
+      let color = $('.just-back').css('background-color');
+      let svgColor = $('.fonts').css('color');
+      $('.main').css({'background-color':`${color}`});
+      $('#update-clicker-words').css({'color':`${svgColor}`});
+      $('#update-clicker-svg').css({'stroke':`${svgColor}`});
       if (i != 0){
         $( `#updates-inner-${i}` ).css({
           'opacity':'0',
           'transform':'scale(0.8)'
         });
       }
-      let changedd = false;
       $( `#updates-inner-${i}` ).draggable({
         containment: "#main-holder",
         scroll: false,
-        stop: () => {
-          //downcount
-          if (parseInt($('#update-circle-text').text()) <= 1){
-          }
-          else {
-            $('#update-circle-text').css({
-              'opacity':`1`,
-              'transform':`scale(1)`
-            });
-          }
-          if (changedd == true){
-            changedd = false;
-            let circleText = parseInt($('#update-circle-text').text());
-            circleText--;
-            $('#update-circle-text').text(circleText);
-          }
-        },
         drag: () => {
           let dragPos = $( `#updates-inner-${i}` ).offset().left;
           dragPos = Math.abs(dragPos);
-          let opac = ( ($( document ).width() - dragPos) / $( document ).width() );
+          opac = ( ($( document ).width() - dragPos) / $( document ).width() );
           opac = Math.round(opac * 100) / 100;
           opac2 = 1 - opac;
           let scale2 = 0.75;
@@ -611,108 +756,15 @@ function flashCards () {
             'transform':`scale(${textScale})`
           });
 
-          //$( `#updates-inner-${i}` ).css({'opacity':`${opac}`});
           $( `#updates-inner-${i+1}` ).css({
             'opacity':`${opac2}`,
             'transform':`scale(${scale2})`
           });
 
-          let argh = $._data($(`#updates-inner-${i}`).get(0),'events');
-          // console.log(argh);
-          // //$(`#updates-inner-${i}`).unbind('mouseup');
-          // console.log(argh);
-
-
-          $(`#updates-inner-${i}`).bind('mouseup', function(e){
-            $(`#updates-inner-${i}`).css({'transition':'0.25s'});
-            $(`#updates-inner-${i+1}`).css({'transition':'0.25s'});
-            $('#update-circle-text').css({'transition':`0.5s`});
-
-            if (opac <= 0.75){
-              //finish the movement
-              if (parseInt($('#update-circle-text').text()) <= 1){
-                $('#update-circle').css({'transition':`1s`});
-                $('#update-circle').css({
-                  'transform':`scale(120)`
-                });
-                setTimeout(() => {
-                  $('#svg-cat').css({
-                    'display':`block`,
-                    'opacity':`1`,
-                  });
-                },450);
-                setTimeout(() => {
-                  $('#svg-cat').css({
-                    'display':`none`,
-                    'opacity':`0`,
-                  });
-                  $('#start-over').css({
-                    'display':'block'
-                  })
-                  $('#update-circle').css({
-                    'transition':`0.5s`,
-                  });
-                  $('#update-circle').css({
-                    'transform':`scale(0)`
-                  });
-                },1000);
-              }
-              $('#update-circle-text').css({
-                'opacity':`0`,
-                'transform':`scale(0)`
-              });
-              dragPos = $( `#updates-inner-${i}` ).offset().left;
-              let windowWidth = $( document ).width();
-              if (dragPos > 0){
-                //move right
-                dragPos = $( `#updates-inner-${i}` ).offset();
-                dragPos.left = windowWidth;
-                $(`#updates-inner-${i}`).offset(dragPos);
-                changedd = true;
-              }
-              else {
-                //move left
-                dragPos = $( `#updates-inner-${i}` ).offset();
-                dragPos.left = -windowWidth;
-                $(`#updates-inner-${i}`).offset(dragPos);
-                changedd = true;
-              }
-              $( `#updates-inner-${i+1}` ).css({
-                'opacity':'1',
-                'transform':'scale(1)'
-              });
-            }
-            else {
-              //put it back
-              changedd = false;
-              $('#update-circle').css({'transition':`0.3s`});
-              $('#update-circle-text').css({'transition':`0.3s`});
-              $('#update-circle').css({
-                'opacity':`1`,
-                'transform':`scale(1)`
-              });
-              $('#update-circle-text').css({'opacity':`1`});
-              $(`#updates-inner-${i}`).css({
-                'transition-timing-function': 'cubic-bezier(.17,-.41,.19,1.44)'
-              });
-              dragPos = $( `#updates-inner-${i}` ).offset();
-              dragPos.left = 7.5;
-              $(`#updates-inner-${i}`).offset(dragPos);
-              //$(`#updates-inner-${i}`).offset(0);
-              $('#update-circle').css({'transition':`0s`});
-              $('#update-circle-text').css({'transition':`0s`});
-            }
-            $(`#updates-inner-${i}`).css({
-              'transition':'0s',
-              'transition-timing-function': 'none'
-            });
-            $(`#updates-inner-${i+1}`).css({'transition':'0s'});
-            $('#update-circle-text').css({'transition':`0s`});
-            $(`#updates-inner-${i}`).unbind('mouseup');
-          });
         }
       });
   });
+  bindMouseToUpdates(currentUpdates.length);
 }
 
 
@@ -722,6 +774,17 @@ function updateUnderTow (id) {
   let leftPos = $(`#${id}`).offset().left;
   //set those to updateUnderTow:
   $(`#choose-time-undertow`).css({
+    'transform': `translateX(${leftPos-5}px)`,
+    'width': `${width+10}`,
+  });
+};
+
+function updateUnderTowDetail (id) {
+  //get id width and left-pos:
+  let width = $(`#${id}`).width();
+  let leftPos = $(`#${id}`).offset().left;
+  //set those to updateUnderTow:
+  $(`#choose-time-undertow-detail`).css({
     'transform': `translateX(${leftPos-5}px)`,
     'width': `${width+10}`,
   });
@@ -801,6 +864,7 @@ $(document).ready(function(){
   });
 
   updateUnderTow("OD");
+  updateUnderTowDetail("OD-detail");
 
   flashCards();
 
@@ -856,9 +920,11 @@ $(document).ready(function(){
 
 
   let date = new Date();
+  let day = date.getDay();
   let hour = date.getHours();
   let min = date.getMinutes();
-  if (hour > 9 || hour < 16){
+  if (day < 1 || day > 5 || hour > 16 || hour < 9 || (hour == 9 && min < 30)) {
+    stockTime = false;
     $("html, body").css({
       "background-color": "#222",
       "color": "#ededed"
@@ -871,8 +937,20 @@ $(document).ready(function(){
       "background-color": "#222",
       "color": "#ededed"
     });
+    $('.just-back').css({
+      "background-color": "#222",
+    });
+    $('.just-color').css({
+      "color": "#ededed",
+    });
+    $('.back-font').css({
+      "background-color": "#222",
+      "color": "#ededed",
+      "-webkit-text-fill-color": "#ededed"
+    });
   }
   else {
+    stockTime = true;
     $("html, body").css({
       "background-color": "#ededed",
       "color": "#222"
@@ -885,15 +963,48 @@ $(document).ready(function(){
       "background-color": "#ededed",
       "color": "#222"
     });
+    $(".just-back").css({
+      "background-color": "#ededed",
+    });
+    $('.just-color').css({
+      "color": "#222",
+    });
+    $('.back-font').css({
+      "background-color": "#ededed",
+      "color": "#222",
+      "-webkit-text-fill-color": "#222"
+    });
   }
+  let color = $(`.just-color`).css('color');
+  $(`#OD`).css({'color':`${color}`});
+  $(`#OD-detail`).css({'color':`${color}`});
 
+  var savePos = 0;
   //Start Over's functionality:
   $('#start-over').draggable({
     containment: "#main-holder",
     scroll: false,
+    start: function (event, ui) {
+      savePos = ui.position.left;
+    },
     drag: function(event, ui) {
-      var mult = 0.5;
-      ui.position.left += ((ui.originalPosition.left - ui.position.left) * mult);
+      let something = 1/Math.pow((1 - 0.00028),-Math.abs(ui.originalPosition.left - ui.position.left));
+      //console.log(0.5 + (1 - something));
+      // console.log(something);
+      // console.log(savePos - ui.position.left);
+      // console.log(`opl: ${ui.originalPosition.left}`);
+      // console.log(`pl: ${ui.position.left}`);
+      // console.log(`opl - pl: ${ui.originalPosition.left - ui.position.left}`);
+      // console.log(`full: ${(ui.originalPosition.left - ui.position.left) * (0.5 + (1 - something))}`);
+      ui.position.left += ((ui.originalPosition.left - ui.position.left) * (0.5 + (1 - something)));
+      savePos = ui.position.left;
+      // if ((mult / percent) < 0.77) {
+      //   ui.position.left += ((ui.originalPosition.left - ui.position.left) * (0.5 + (1 - something)));
+      //   savePos = ui.position.left;
+      // }
+      // else {
+      //   ui.position.left = savePos;
+      // }
     }
   });
 
@@ -965,9 +1076,13 @@ $(document).ready(function(){
     $("#stockSearch").val('');
     $('.stock-info').remove();
     $('body').removeClass('stop-scrolling');
+    $('#stock-prev-close').text(`${myChartPrevN}`);
+    updateMoney(`#myChart`,myLatestVal,myChartPrev);
   });
 
   $(".exit-in-2").click(() => {
+    $('#stock-prev-close').text(`${myChartPrevN}`);
+    updateMoney(`#myChart`,myLatestVal,myChartPrev);
     if ( $('.searches').css('opacity') == 0 ) {
       $('body').removeClass('stop-scrolling');
     }
@@ -999,8 +1114,23 @@ $(document).ready(function(){
     $("#TM").css({'color':'inherit'});
     $("#OY").css({'color':'inherit'});
     $("#ALL").css({'color':'inherit'});
-    $(`#${id}`).css({'color':'#ededed'});
+    let color = $(`.just-color`).css('color');
+    $(`#${id}`).css({'color':`${color}`});
     updateUnderTow(id);
+  });
+
+  $('#choose-time-detail > span').click((e) => {
+    let id = e.target.id;
+    $(`#choose-time-undertow-detail`).css({'transition': '0.6s'});
+    $("#OD-detail").css({'color':'inherit'});
+    $("#OW-detail").css({'color':'inherit'});
+    $("#OM-detail").css({'color':'inherit'});
+    $("#TM-detail").css({'color':'inherit'});
+    $("#OY-detail").css({'color':'inherit'});
+    $("#ALL-detail").css({'color':'inherit'});
+    let color = $(`.just-color`).css('color');
+    $(`#${id}`).css({'color':`${color}`});
+    updateUnderTowDetail(id);
   });
 
   $('#redo-over').click(() => {
@@ -1064,10 +1194,10 @@ function addStocks (stocks,callback) {
   stocks.forEach((stock) => {
     if (stock.exchDisp == 'NYSE' || stock.exchDisp == 'NASDAQ'){
       $(".searches").append(`
-      <div class="stock-info" id="${stock.symbol}">
+      <div class="stock-info" id="info-${stock.symbol}">
 
         <div class="stock-left">
-          <div class="stock-symbol">${stock.symbol}</div>
+          <div class="stock-symbol just-color">${stock.symbol}</div>
           <div class="stock-name">${stock.name}</div>
           <div class="stock-exchange">${stock.exchDisp}</div>
         </div>
@@ -1100,7 +1230,7 @@ function addStocks (stocks,callback) {
 
       </div>
       `);
-      $(`#${stock.symbol} .stock-data`).css({
+      $(`#info-${stock.symbol} .stock-data`).css({
         'right':'160px',
         'width': '30vw'
       });
@@ -1114,6 +1244,8 @@ function updateValues () {
     let idName = $(this);
     idName = idName[0].id;
     let currentOpen = 0;
+    let idTicker = idName.split('-');
+    idTicker = idTicker[1];
 
     //get money info:
     let xmlHttp2 = new XMLHttpRequest();
@@ -1142,8 +1274,8 @@ function updateValues () {
           startDate = startDate[1].split(',');
           endDate = startDate[1];
           startDate = startDate[0];
-          startDate = new Date(parseInt(startDate));
-          endDate = new Date(parseInt(endDate));
+          startDate = new Date(parseInt(startDate)*1000);
+          endDate = new Date(parseInt(endDate)*1000);
           lastPoint = currentOpen[currentOpen.length-2];
           lastPoint = lastPoint.split(',');
           lastPoint = lastPoint[4];
@@ -1159,7 +1291,7 @@ function updateValues () {
             $(`#${idName} .stock-add`).css({"stroke": "#30cd9a"});
             $(`#${idName} .stock-added`).css({"fill": "#30cd9a","stroke":"#30cd9a"});
           }
-          if (user.watching.includes(idName)){
+          if (user.watching.includes(idTicker)){
             $(`#${idName} .stock-add`).css({'display':'none'});
             $(`#${idName} .stock-added`).css({'display':'block'});
           }
@@ -1169,22 +1301,24 @@ function updateValues () {
             if (i % 5 == 0){
               value = value.split(',');
               obj = {'x':0,'y':0};
-              obj.x = new Date(parseInt(value[0]));
+              obj.x = new Date(parseInt(value[0])*1000);
               obj.y = parseFloat(value[1]);
               chartDate.push(obj);
             }
           });
 
+          startDate = chartDate[0].x;
+          //endDate = chartDate[chartDate.length-1].x;
           let chart = new Chartist.Line(`#${idName} .stock-data`, {
             labels: ['W1'],
             series: [
               {
-                name: 'series',
-                data: chartDate,
-              },
-              {
                 name: 'line',
                 data: [{'x':startDate,'y':prevClose},{'x':endDate,'y':prevClose}],
+              },
+              {
+                name: 'series',
+                data: chartDate,
               }
             ]
           }, optionsNoPlugins);
@@ -1198,7 +1332,7 @@ function updateValues () {
           });
         }
     }
-    xmlHttp2.open("GET", `http://chartapi.finance.yahoo.com/instrument/2.0/${idName}/chartdata;type=quote;range=1d/csv`, true); // true for asynchronous
+    xmlHttp2.open("GET", `http://chartapi.finance.yahoo.com/instrument/2.0/${idTicker}/chartdata;type=quote;range=1d/csv`, true); // true for asynchronous
     xmlHttp2.setRequestHeader( 'Access-Control-Allow-Origin', '*');
     xmlHttp2.send();
 
@@ -1216,10 +1350,10 @@ function addMainStocks (stocks,callback,which) {
         <div class="buy" id="by">BUY</div>
         <div class="sell" id="sll">SELL</div>
         <div class="delete" id="dlt">DELETE</div>
-        <div class="stock-main-info" id="${stock}">
+        <div class="stock-main-info just-back" id="${stock}">
 
           <div class="stock-left">
-            <div class="stock-symbol">${stock}</div>
+            <div class="stock-symbol just-color">${stock}</div>
             <div class="stock-name"></div>
           </div>
 
@@ -1252,7 +1386,6 @@ function addMainStocks (stocks,callback,which) {
         },
         drag: function (event, ui) {
           var mult = 0.5;
-          console.log(`pos: ${ui.position.left}`);
           if (ui.position.left <= 0){
             ui.position.left -= ((1 + (ui.position.left)) * mult);
           }
@@ -1307,8 +1440,8 @@ function updateMainValues () {
           startDate = startDate[1].split(',');
           endDate = startDate[1];
           startDate = startDate[0];
-          startDate = new Date(parseInt(startDate));
-          endDate = new Date(parseInt(endDate));
+          startDate = new Date(parseInt(startDate)*1000);
+          endDate = new Date(parseInt(endDate)*1000);
           lastPoint = currentOpen[currentOpen.length-2];
           lastPoint = lastPoint.split(',');
           lastPoint = lastPoint[4];
@@ -1328,22 +1461,24 @@ function updateMainValues () {
             if (i % 5 == 0){
               value = value.split(',');
               obj = {'x':0,'y':0};
-              obj.x = new Date(parseInt(value[0]));
+              obj.x = new Date(parseInt(value[0])*1000);
               obj.y = parseFloat(value[1]);
               chartDate.push(obj);
             }
           });
 
-          let chart = new Chartist.Line(`#${idName} .stock-data`, {
+          startDate = chartDate[0].x;
+          //endDate = chartDate[chartDate.length-1].x;
+          let chart = new Chartist.Line(`#containment-wrapper-${idName} .stock-data`, {
             labels: ['W1'],
             series: [
               {
-                name: 'series',
-                data: chartDate,
-              },
-              {
                 name: 'line',
                 data: [{'x':startDate,'y':prevClose},{'x':endDate,'y':prevClose}],
+              },
+              {
+                name: 'series',
+                data: chartDate,
               }
             ]
           }, optionsNoPlugins);

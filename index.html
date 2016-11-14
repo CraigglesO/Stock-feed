@@ -41,9 +41,9 @@
 
 	<body>
 
-		<div id="stock-prev-close"></div>
+	 <div id="stock-prev-close"></div>
 
-	 <div class="searches">
+	 <div class="searches just-back">
 		 <div class="search-in">
 			 <svg version="1.1" id="search-inside" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 			 width="41.3px" height="42.2px" viewBox="0 0 41.3 42.2" style="enable-background:new 0 0 41.3 42.2;" xml:space="preserve">
@@ -54,7 +54,7 @@
 			 </svg>
 		 </div>
 
-		 <input id="stockSearch" type="text" name="stockSearch" value="" placeholder="Search">
+		 <input class="back-font" id="stockSearch" type="text" name="stockSearch" value="" placeholder="Search">
 
 		 <div class="exit-in">
 			 <svg version="1.1" id="exit-inside" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
@@ -79,7 +79,7 @@
 
 		<div class="start">
 
-			<div class="top-bar">
+			<div class="top-bar just-back">
 				<div class="user">
 					<svg version="1.1" id="user" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 					width="43px" height="42.2px" viewBox="0 0 43 42.2" style="enable-background:new 0 0 43 42.2;" xml:space="preserve">
@@ -213,7 +213,7 @@
 						</svg>
 					</div>
 
-					<div class="main-over" id="start-over">
+					<div class="main-over just-back" id="start-over">
 						<div class="content-over">You're all caught up!</div>
 						<div class="fonts" id="redo-over">START OVER</div>
 					</div>
@@ -226,14 +226,14 @@
 		</div>
 
 		<div class="border" id="my-stock">
-			<div id="my-stock-myTickers"></div>
+			<div class="just-back" id="my-stock-myTickers"></div>
 			<div class="watchlist"><span id="watchlist-text">WATCHLIST</span></div>
-			<div id="my-stock-watching"></div>
+			<div class="just-back" id="my-stock-watching"></div>
 		</div>
 
 
-		<div class="stock-detail">
-			<div class="top">
+		<div class="stock-detail just-back">
+			<div class="top just-back">
 				<div class="exit-in-2">
 					<svg version="1.1" class="objects" id="exit-inside-2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
 					y="0px" width="41.3px" height="42.2px" viewBox="0 0 41.3 42.2" enable-background="new 0 0 41.3 42.2" xml:space="preserve">
@@ -243,8 +243,29 @@
 				</div>
 
 				<div class="company-detail">
-					<div id="ticker-detail">Ticker</div>
+					<div class="just-color" id="ticker-detail">Ticker</div>
 					<div id="full-name-detail">About</div>
+				</div>
+
+				<div class="stock-add-detail objects objects-fill">
+					<svg version="1.1" id="svg-add-detail" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+					width="19.7px" height="19.7px" viewBox="0 0 19.7 19.7" style="enable-background:new 0 0 19.7 19.7;" xml:space="preserve">
+						<circle id="svg-add-detail" style="fill:none;stroke-miterlimit:10;" cx="9.8" cy="9.8" r="9.3"/>
+						<g id="svg-add-detail">
+
+							<line id="svg-add-detail" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="9.8" y1="5.2" x2="9.8" y2="14.5"/>
+
+							<line id="svg-add-detail" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="5.2" y1="9.8" x2="14.5" y2="9.8"/>
+						</g>
+					</svg>
+				</div>
+				<div class="stock-added-detail objects objects-fill">
+					<svg version="1.1" id="svg-added-detail" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+					width="19.7px" height="19.7px" viewBox="0 0 19.7 19.7" style="enable-background:new 0 0 19.7 19.7;" xml:space="preserve">
+						<path id="svg-added-detail" style="stroke-miterlimit:10;" d="M9.8,0.5c-5.2,0-9.3,4.2-9.3,9.3s4.2,9.3,9.3,9.3
+						c5.2,0,9.3-4.2,9.3-9.3S15,0.5,9.8,0.5z M16.1,7.3l-7.3,7.3c0,0,0,0,0,0c-0.3,0.3-0.7,0.4-1.1,0.4S7,14.9,6.7,14.6l-3.2-3.2
+						C3,10.9,3,9.9,3.6,9.3c0.6-0.6,1.5-0.6,2.1,0l2.1,2.1L14,5.2c0.6-0.6,1.5-0.6,2.1,0C16.7,5.8,16.7,6.8,16.1,7.3z"/>
+					</svg>
 				</div>
 			</div>
 
@@ -274,6 +295,15 @@
 				<span id="OY-detail">1Y</span>
 				<span id="ALL-detail">ALL</span>
 			</div>
+			<div class="backgrounding" id="choose-time-undertow-detail"></div>
+			<div class="bottom border">
+				<div class="backgrounding" id="sell-buy">Sell</div>
+				<div class="backgrounding" id="buy-sell">Buy</div>
+			</div>
+			<div class="extra-content back-font">
+
+			</div>
+		</div>
 
 
 	</body>
