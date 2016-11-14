@@ -14,7 +14,7 @@ var user = {
   name: 'Craig O\'Connor',
   portfolioValue: 0,
   buyingPower: 0,
-  ticker: 'AMDA',
+  ticker: 'DOV',
   myTickers: ['MDXG','AMD','AMDA','AAPL'],
   watching: ['DOV','AAPL','GOOGL','AMD','PMTS','AMDA','MDXG','HALO','FIG','GPRO','FIT','TWTR','NFLX'],
   updates: [
