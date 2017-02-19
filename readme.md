@@ -1,5 +1,7 @@
 # Stock-feed
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/CraigglesO/Stock-feed.svg)](https://greenkeeper.io/)
+
 > My stylish app
 
 
